@@ -128,10 +128,122 @@ Helpers live in `app/utils/scrapper.py`.
 Current helpers:
 
 - `get_page_html()` fetches the page HTML
-- `get_span_element()` extracts text from a `<span>` with a given class
-- `get_div_element()` extracts text from a `<div>` with a given class
+- `get_element_text()` extracts text from a given HTML tag and class
+- `get_span_element()` is a convenience wrapper for `<span>` elements
+- `get_div_element()` is a convenience wrapper for `<div>` elements
+- `extract_price()` parses price strings like `$52,00` into floats
 
 These helpers already use `run_in_thread()` for BeautifulSoup parsing.
+
+## Simple Vs Complex Routes
+
+There are currently two route families in this project:
+
+1. simple `/dolar`-style routes
+2. more complex `/boleto`-style routes
+
+If you are new, start with a simple route first.
+
+Examples of simple routes:
+
+- `/dolar`
+- `/supergas`
+- `/tarifa-electrica/residencial-simple`
+- `/tarifa-electrica/doble-horario`
+- `/tarifa-electrica/triple-horario`
+
+Examples of more complex routes:
+
+- `/boleto`
+- `/ipc`
+- `/indice-costo-construccion-vivienda`
+- `/inflacion`
+- `/pbi`
+- `/combustible`
+- `/peajes`
+
+### Simple `/dolar`-Style Routes
+
+Use this pattern when:
+
+- the page only needs one main value
+- the value can be extracted with one simple selector
+- the response is a small dict like `{"dolar": "40.25"}`
+
+These routes usually need:
+
+1. one router
+2. one service
+3. one or two generic scraper helpers
+
+### Complex `/boleto`-Style Routes
+
+Use this pattern when:
+
+- the page contains repeated blocks
+- the response needs multiple grouped values
+- there are optional prices or special cases like `Gratis`
+- you need to parse sections, cards, or lists instead of one value
+
+For these routes, do not try to solve everything with repeated calls to `get_span_element()`.
+
+Instead:
+
+1. fetch the page once with `get_page_html()`
+2. parse the full HTML in the service layer
+3. group the data into a clean JSON structure
+4. keep generic helpers in `app/utils/scrapper.py`
+5. keep page-specific parsing logic in the service file
+
+The current reference implementation for this style is `/boleto`.
+
+### Complex Route Checklist
+
+For a boleto-style route, the service should usually:
+
+1. fetch the HTML once
+2. parse the document once
+3. identify the major sections
+4. extract repeated items into a list of dicts
+5. normalize prices and missing values
+6. return a structure that is easy for API consumers to use
+
+Recommended approach:
+
+- generic parsing helpers in `app/utils/scrapper.py`
+- route-specific extraction logic in `app/services/<route>.py`
+- minimal HTTP logic in `app/routers/<route>.py`
+
+### Example Complex Response Shape
+
+```json
+{
+  "vigencia": {
+    "fecha": "2026-01-05",
+    "detalle": "Tarifas vigentes desde January 05, 2026"
+  },
+  "tarifas": {
+    "generales": [
+      {
+        "ticket_type": "Común 1 hora",
+        "tarjeta": 52.0,
+        "efectivo": 64.0,
+        "gratis": false
+      }
+    ],
+    "especiales": [
+      {
+        "ticket_type": "Escolar",
+        "tarjeta": null,
+        "efectivo": null,
+        "gratis": true
+      }
+    ]
+  }
+}
+```
+
+This grouped-by-ticket-type style is preferred for more complex tariff endpoints.
 
 ## File Changes Needed For A New Route
 
@@ -193,6 +305,8 @@ If the value is inside:
 
 - a `<span>`, use `get_span_element()`
 - a `<div>`, use `get_div_element()`
+
+If you need a different tag but still only want a single value, use `get_element_text()`.
 
 If neither works, add a new helper only if needed.
 
