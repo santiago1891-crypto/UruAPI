@@ -18,14 +18,14 @@ Welcome to UruAPI! An API that wraps [datosuruguay.com](https://datosuruguay.com
 
 UruAPI is a wrapper around [datosuruguay.com](https://datosuruguay.com/) and exposes Uruguay's daily-updated economic indicators in a clean, JSON-friendly format.
 
-All data originates from official sources — the Central Bank of Uruguay (BCU), the National Statistics Institute (INE), and the Social Security Bank (BPS). See the full list in the datosuruguay.com [methodology](https://datosuruguay.com/metodologia).
+All data originates from official sources_ the Central Bank of Uruguay (BCU), the National Statistics Institute (INE), and the Social Security Bank (BPS). See the full list in the datosuruguay.com [methodology](https://datosuruguay.com/metodologia).
 
 ### Data available
 
-- 💱 **Exchange rates** — USD, EUR, BRL, ARS
-- 📈 **Price indices** — Inflation (IPC) and Unidad Indexada (UI)
-- ⛽ **Fuel & transport** — ANCAP fuel, Montevideo transit (STM), tolls
-- 🏛️ **Social security** — BPS indices, pensions, family allowances
+- **Exchange rates**: USD, EUR, BRL, ARS
+- **Price indices**: Inflation (IPC) and Unidad Indexada (UI)
+- **Fuel & transport**: ANCAP fuel, Montevideo transit (STM), tolls
+- **Social security**: BPS indices, pensions, family allowances
 
 ### Tech Stack
 
@@ -37,8 +37,8 @@ All data originates from official sources — the Central Bank of Uruguay (BCU),
 
 ### Prerequisites
 
-- Python 3.11 or higher — [Link](https://www.python.org/downloads/)
-- uv — [Link](https://docs.astral.sh/uv/getting-started/installation/)
+- Python 3.11 or higher: [Link](https://www.python.org/downloads/)
+- uv: [Link](https://docs.astral.sh/uv/getting-started/installation/)
 
 ### Local Development Setup
 
@@ -52,30 +52,48 @@ All data originates from official sources — the Central Bank of Uruguay (BCU),
    uv sync
    ```
 
-* TODO
+3. Run the development server:
+   ```bash
+   uv run uvicorn app.main:main --reload --port 8083
+   ```
 
 ### Interactive API docs
 
 Once the server is running, you can view the automatic documentation at:
 
-- Swagger UI: `http://localhost:8000/docs`
+- Swagger UI: `http://localhost:8083/docs`
 
 ### With Docker
 
-* TODO
+1. Build and start the container:
+   ```bash
+   docker compose up --build
+   ```
+
+2. Stop the container:
+   ```bash
+   docker compose down
+   ```
+
+The API will be available at `http://localhost:8083`.
 
 ## Project Structure
 
 ```
 UruAPI/
-├── app/                # Main application code
-│   ├── main.py         # FastAPI entry point
-│   └── ...             # API modules
-├── tests/              # Test suite
-├── pyproject.toml      # Project metadata & dependencies
-├── uv.lock             # Dependency lockfile
+├── app/                     # Main application package
+│   ├── main.py              # FastAPI entry point
+│   ├── threading.py         # Async helpers for thread offloading
+│   ├── routers/             # API route modules
+│   ├── schemas/             # Request/response schemas
+│   ├── services/            # Service layer package
+│   ├── scrappers/           # Scraper package
+│   └── utils/               # Shared utilities and scraping helpers
+├── pyproject.toml           # Project metadata & dependencies
+├── README.md
+└── uv.lock                  # Dependency lockfile
 ```
-* TODO
+
 ## How to Contribute
 
 Want to add a new endpoint or improve an existing one? Great!
