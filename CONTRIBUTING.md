@@ -4,9 +4,7 @@ Thanks for contributing.
 
 This project is still small, so the easiest way to add a new endpoint is to follow the same pattern used by the existing `/dolar` route.
 
-This guide is specific to `UruAPI`, but it should be read together with the general LibreCourseUY contribution guide:
-
-- `https://github.com/LibreCourseUY/.github/blob/master/CONTRIBUTING.md`
+This guide is specific to `UruAPI`, but it should be read together with the general [LibreCourseUY contribution guide](https://github.com/LibreCourseUY/.github/blob/master/CONTRIBUTING.md).
 
 ## Before You Start
 
